@@ -9,11 +9,16 @@ interface CustomElement {
  *
  * Example: HelloController => hello-controller
  */
-export function register(classObject: CustomElement): void {
-  const name = classObject.name
-    .replace(/([A-Z]($|[a-z]))/g, '-$1')
-    .replace(/(^-|-Element$)/g, '')
-    .toLowerCase()
+export function register(classObject: CustomElement, givenName?: string): void {
+  let name;
+  if(!givenName) {
+    name = classObject.name
+      .replace(/([A-Z]($|[a-z]))/g, '-$1')
+      .replace(/(^-|-Element$)/g, '')
+      .toLowerCase()
+  } else {
+    name = givenName;
+  }
   if (!window.customElements.get(name)) {
     // eslint-disable-next-line @typescript-eslint/ban-ts-comment
     // @ts-ignore

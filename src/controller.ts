@@ -12,13 +12,23 @@ interface CustomElement {
  * registry, as well as ensuring `bind(this)` is called on `connectedCallback`,
  * wrapping the classes `connectedCallback` method if needed.
  */
-export function controller(classObject: CustomElement): void {
-  const connect = classObject.prototype.connectedCallback
-  classObject.prototype.connectedCallback = function (this: HTMLElement) {
-    this.toggleAttribute('data-catalyst', true)
-    autoShadowRoot(this)
-    if (connect) connect.call(this)
-    bind(this)
+export function controller(classObject: CustomElement|string): void {
+  let name;
+  if(typeof classObject === 'string') {
+    name = classObject;
+    return (co) => buildController(co, name);
   }
-  register(classObject)
+  buildController(classObject);
+
+  function buildController(classObject: CustomElement, name: string) {
+    const connect = classObject.prototype.connectedCallback;
+    classObject.prototype.connectedCallback = function (this: HTMLElement) {
+      this.toggleAttribute('data-catalyst', true);
+      autoShadowRoot(this);
+      if (connect)
+        connect.call(this);
+      bind(this);
+    };
+    register(classObject, name);
+  }
 }
